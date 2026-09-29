@@ -8,130 +8,69 @@ import {
 } from "react-native";
 
 export default function App() {
-  // Guarda o que está sendo digitado
   const [produto, setProduto] = useState("");
+  const [lista, setLista] = useState([]);
 
-  // Guarda todos os produtos
-  const [produtos, setProdutos] = useState([]);
-
-  // Adiciona um produto à lista
   function adicionarProduto() {
-    // Impede produtos vazios
-    if (produto.trim() === "") {
+    if (produto === "") {
       return;
     }
 
-    // Impede produtos duplicados
-    const produtoJaExiste = produtos.some(
-      (item) => item.nome.toLowerCase() === produto.trim().toLowerCase()
-    );
-
-    if (produtoJaExiste) {
-      return;
-    }
-
-    // Cria o novo produto
-    const novoProduto = {
-      id: Date.now().toString(),
-      nome: produto.trim(),
-      comprado: false,
-    };
-
-    // Adiciona o produto ao array
-    setProdutos([...produtos, novoProduto]);
-
-    // Limpa o campo
+    setLista([...lista, produto]);
     setProduto("");
   }
 
-  // Remove um produto
-  function removerProduto(id) {
-    const novaLista = produtos.filter((item) => item.id !== id);
+  function removerProduto(index) {
+    const novaLista = lista.filter((item, i) => i !== index);
 
-    setProdutos(novaLista);
-  }
-
-  // Marca/desmarca um produto como comprado
-  function alternarComprado(id) {
-    const novaLista = produtos.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          comprado: !item.comprado,
-        };
-      }
-
-      return item;
-    });
-
-    setProdutos(novaLista);
-  }
-
-  // Limpa toda a lista
-  function limparLista() {
-    setProdutos([]);
+    setLista(novaLista);
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Minha Lista de Compras</Text>
 
-      <Text style={styles.contador}>
-        Produtos: {produtos.length}
+      <Text style={styles.titulo}>
+        Minha Lista de Compras
       </Text>
 
-      <View style={styles.areaInput}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite um produto..."
-          value={produto}
-          onChangeText={setProduto}
-        />
+      <TextInput
+        style={styles.input}
+        placeholder="Digite um produto..."
+        value={produto}
+        onChangeText={setProduto}
+      />
 
-        <Pressable
-          style={styles.botaoAdicionar}
-          onPress={adicionarProduto}
-        >
-          <Text style={styles.textoBotao}>ADICIONAR</Text>
-        </Pressable>
-      </View>
+      <Pressable
+        style={styles.botao}
+        onPress={adicionarProduto}
+      >
+        <Text style={styles.textoBotao}>
+          ADICIONAR
+        </Text>
+      </Pressable>
 
-      <View style={styles.lista}>
-        {produtos.map((item) => (
-          <View style={styles.produto} key={item.id}>
-            <Pressable
-              style={styles.nomeProdutoArea}
-              onPress={() => alternarComprado(item.id)}
-            >
-              <Text
-                style={[
-                  styles.nomeProduto,
-                  item.comprado && styles.produtoComprado,
-                ]}
-              >
-                {item.comprado ? "✅ " : "🛒 "}
-                {item.nome}
-              </Text>
-            </Pressable>
+      <Text style={styles.contador}>
+        Produtos: {lista.length}
+      </Text>
 
-            <Pressable
-              style={styles.botaoRemover}
-              onPress={() => removerProduto(item.id)}
-            >
-              <Text style={styles.textoRemover}>✕</Text>
-            </Pressable>
-          </View>
-        ))}
-      </View>
+      {lista.map((item, index) => (
+        <View style={styles.produto} key={index}>
 
-      {produtos.length > 0 && (
-        <Pressable
-          style={styles.botaoLimpar}
-          onPress={limparLista}
-        >
-          <Text style={styles.textoBotao}>LIMPAR LISTA</Text>
-        </Pressable>
-      )}
+          <Text style={styles.nome}>
+            {item}
+          </Text>
+
+          <Pressable
+            onPress={() => removerProduto(index)}
+          >
+            <Text style={styles.excluir}>
+              ❌
+            </Text>
+          </Pressable>
+
+        </View>
+      ))}
+
     </View>
   );
 }
@@ -139,99 +78,62 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4",
-    padding: 25,
-    paddingTop: 70,
+    padding: 20,
+    paddingTop: 60,
+    backgroundColor: "#f2f2f2",
   },
 
   titulo: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 8,
-  },
-
-  contador: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "#666",
     marginBottom: 25,
   },
 
-  areaInput: {
-    gap: 10,
-  },
-
   input: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#cccccc",
-    borderRadius: 10,
-    padding: 15,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
     fontSize: 16,
+    marginBottom: 10,
   },
 
-  botaoAdicionar: {
-    backgroundColor: "#222222",
-    padding: 15,
-    borderRadius: 10,
+  botao: {
+    backgroundColor: "#333",
+    padding: 14,
+    borderRadius: 8,
     alignItems: "center",
   },
 
   textoBotao: {
-    color: "#ffffff",
+    color: "white",
     fontWeight: "bold",
-    fontSize: 15,
   },
 
-  lista: {
+  contador: {
+    fontSize: 18,
+    fontWeight: "bold",
     marginTop: 25,
-    gap: 10,
+    marginBottom: 10,
   },
 
   produto: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
+    backgroundColor: "white",
     padding: 15,
+    marginBottom: 10,
+    borderRadius: 8,
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
   },
 
-  nomeProdutoArea: {
-    flex: 1,
-  },
-
-  nomeProduto: {
+  nome: {
     fontSize: 18,
   },
 
-  produtoComprado: {
-    textDecorationLine: "line-through",
-    color: "#888888",
-  },
-
-  botaoRemover: {
-    backgroundColor: "#eeeeee",
-    width: 35,
-    height: 35,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 10,
-  },
-
-  textoRemover: {
-    color: "#cc0000",
-    fontWeight: "bold",
+  excluir: {
     fontSize: 18,
-  },
-
-  botaoLimpar: {
-    backgroundColor: "#cc0000",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 25,
   },
 });
